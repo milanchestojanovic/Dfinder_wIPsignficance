@@ -130,6 +130,7 @@ class EvtInfoBranches{ //{{{
         float  BSWidthXErr;
         float  BSWidthY;
         float  BSWidthYErr;
+
 		//float	PVc2p;
 		
 		void regTree(TTree *root){//{{{
@@ -656,6 +657,8 @@ public:
     float  svpvDistance_2D[MAX_XB];
     float  svpvDisErr_2D[MAX_XB];
     float  MaxDoca[MAX_XB];
+    float  ip3d[MAX_XB];
+    float  ip3derr[MAX_XB];
     float  vtxX[MAX_XB];
     float  vtxY[MAX_XB];
     float  vtxZ[MAX_XB];
@@ -1018,6 +1021,8 @@ public:
     float  vtxZYErr[MAX_XB];
     float	vtxdof[MAX_XB];
     float	vtxchi2[MAX_XB];
+    float  ip3d[MAX_XB];
+    float  ip3derr[MAX_XB];
     float  rftk1_mass[MAX_XB];
     float  rftk1_pt[MAX_XB];
     float  rftk1_eta[MAX_XB];

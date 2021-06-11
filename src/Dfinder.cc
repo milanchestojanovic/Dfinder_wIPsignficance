@@ -8,6 +8,9 @@
 
 #include "DataFormats/HeavyIonEvent/interface/CentralityBins.h"
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+
+#include "TrackingTools/GeomPropagators/interface/AnalyticalImpactPointExtrapolator.h"
+
 //
 // class declaration
 //
@@ -1739,6 +1742,11 @@ void Dfinder::BranchOutNTk(//input 2~4 tracks
     RefCountedKinematicParticle     tktkRes_VFP;
     RefCountedKinematicVertex       tktkRes_VFPvtx;
 
+    //needed for IP error
+    const MagneticField *field = bField.product();
+    AnalyticalImpactPointExtrapolator extrapolator(field);
+    TrajectoryStateOnSurface tsos;
+
     TLorentzVector v4_tk;
     std::vector<TLorentzVector> tktk_4vecs;//fitted tks
     TLorentzVector tktk_4vec;//fitted D
@@ -1979,6 +1987,18 @@ void Dfinder::BranchOutNTk(//input 2~4 tracks
         else if( DInfo.pt[DInfo.size] > dCutSeparating_PtVal_[Dchannel_number-1] && (DInfo.svpvDistance[DInfo.size]/DInfo.svpvDisErr[DInfo.size]) < svpvDistanceCut_highptD_[Dchannel_number-1]) continue;
         DMassCutLevel[Dchannel_number-1]->Fill(12);
 
+        tsos = extrapolator.extrapolate(tktk_VFP->currentState().freeTrajectoryState(),
+                                   RecoVertex::convertPos(thePrimaryV.position()));
+        //std::pair<bool, Measurement1D> cur3DIP;
+        Measurement1D cur3DIP;
+
+        GlobalPoint refPoint          = tsos.globalPosition();
+        GlobalError refPointErr       = tsos.cartesianError().position();
+        GlobalPoint vertexPosition    = RecoVertex::convertPos(thePrimaryV.position());
+        GlobalError vertexPositionErr = RecoVertex::convertError(thePrimaryV.error());
+        cur3DIP =  (a3d.distance(VertexState(vertexPosition,vertexPositionErr), VertexState(refPoint, refPointErr))); //IPTools::absoluteImpactParameter3D(tsos, thePrimaryV, a3d);
+        std::cout<<cur3DIP.value()<<std::endl;
+
         reco::Vertex::Point vp1(thePrimaryV.position().x(), thePrimaryV.position().y(), 0.);
         reco::Vertex::Point vp2(tktk_VFPvtx->vertexState().position().x(), tktk_VFPvtx->vertexState().position().y(), 0.);
         ROOT::Math::SVector<double, 6> sv1(thePrimaryV.covariance(0,0), thePrimaryV.covariance(0,1), thePrimaryV.covariance(1,1), 0., 0., 0.);
@@ -2019,6 +2039,10 @@ void Dfinder::BranchOutNTk(//input 2~4 tracks
         DInfo.dlerror[DInfo.size]         = sqrt(ROOT::Math::Similarity(totalCov, distanceVector));
         DInfo.sigmaLvtxMag[DInfo.size]    = sqrt(ROOT::Math::Similarity(d0TotalCov, distanceVector));
         DInfo.lvtxMag[DInfo.size]         = d0LineOfFlight.mag(); 
+
+
+        DInfo.ip3d[DInfo.size]            = cur3DIP.value();
+        DInfo.ip3derr[DInfo.size]         = cur3DIP.error();
 
         DInfo.vtxX[DInfo.size]            = tktk_VFPvtx->position().x();
         DInfo.vtxY[DInfo.size]            = tktk_VFPvtx->position().y();

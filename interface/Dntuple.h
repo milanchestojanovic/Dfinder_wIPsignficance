@@ -74,6 +74,9 @@ class DntupleBranches
   float   DtktkRes_lxyBS[MAX_XB];
   float   DtktkRes_lxyBSErr[MAX_XB];
   float   DMaxDoca[MAX_XB];
+  float   Dip3d[MAX_XB];
+  float   Dip3derr[MAX_XB];
+
 
   //DInfo.trkInfo
   int     Dtrk1Idx[MAX_XB];
@@ -335,6 +338,8 @@ class DntupleBranches
     //dnt->Branch("DtktkRes_lxyBS",DtktkRes_lxyBS,"DtktkRes_lxyBS[Dsize]/F");
     //dnt->Branch("DtktkRes_lxyBSErr",DtktkRes_lxyBSErr,"DtktkRes_lxyBSErr[Dsize]/F");
     //dnt->Branch("DMaxDoca",DMaxDoca,"DMaxDoca[Dsize]/F");
+    dnt->Branch("ImpactParameter3D",Dip3d,"Dip3d[Dsize]/F");
+    dnt->Branch("ImpactParameter3Derror",Dip3derr,"Dip3derr[Dsize]/F");
 
     //DInfo.trkInfo
     //dnt->Branch("Dtrk1Pt",Dtrk1Pt,"Dtrk1Pt[Dsize]/F");
@@ -982,6 +987,8 @@ class DntupleBranches
     DtktkRes_lxyBS[typesize] = TMath::Sqrt(r2lxyBS);
     DtktkRes_lxyBSErr[typesize] = (1./r2lxyBS) * ((xlxyBS*xlxyBS)*DInfo->tktkRes_vtxXErr[j] + (2*xlxyBS*ylxyBS)*DInfo->tktkRes_vtxYXErr[j] + (ylxyBS*ylxyBS)*DInfo->tktkRes_vtxYErr[j]);
     DMaxDoca[typesize] = DInfo->MaxDoca[j];
+    Dip3d[typesize] = DInfo->ip3d[j];    
+    Dip3derr[typesize] = DInfo->ip3derr[j];
 
     //DInfo.trkInfo
     float trk1mass,trk2mass,trk3mass,trk4mass;
